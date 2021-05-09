@@ -31,8 +31,6 @@ def runJob():
         twitter_url = helpers._config("TT_SOURCE_TWITTER_URL", config)
         mastodon_url = helpers._config("TT_HOST_INSTANCE", config)
         mastodon_token = helpers._config("TT_APP_SECURE_TOKEN", config)
-        mastodon_client_id = helpers._config("TT_APP_CLIENT_ID", config)
-        mastodon_client_token = helpers._config("TT_APP_CLIENT_TOKEN", config)
         twitter_user_id = helpers._config("TT_TWITTER_USER_ID", config)
         twitter_api_key = helpers._config("TT_TWITTER_CONSUMER_KEY", config)
         twitter_api_secret = helpers._config("TT_TWITTER_CONSUMER_SECRET", config)
@@ -58,8 +56,6 @@ def runJob():
                 twitter_url = twitter_url,
                 mastodon_url = mastodon_url,
                 mastodon_token = mastodon_token,
-                mastodon_client_id = mastodon_client_id,
-                mastodon_client_token = mastodon_client_token,
                 twitter_user_id = twitter_user_id,
                 twitter_api_key = twitter_api_key,
                 twitter_api_secret = twitter_api_secret,

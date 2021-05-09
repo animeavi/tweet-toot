@@ -20,8 +20,6 @@ class TweetToot:
     twitter_url = ""
     mastodon_url = ""
     mastodon_token = ""
-    mastodon_client_id = ""
-    mastodon_client_token = ""
     twitter_user_id = 0
     twitter_api_key = ""
     twitter_api_secret = ""
@@ -37,16 +35,13 @@ class TweetToot:
     logger_prefix = ""
 
     def __init__(self, app_name: str, twitter_url: str, mastodon_url: str, mastodon_token: str,
-                mastodon_client_id: str, mastodon_client_token: str, twitter_user_id: str,
-                twitter_api_key: str, twitter_api_secret: str, twitter_user_key: str,
+                twitter_user_id: str, twitter_api_key: str, twitter_api_secret: str, twitter_user_key: str,
                 twitter_user_secret: str, strip_urls: bool, include_rts: bool, tweet_amount: int,
                 misskey: bool):
         self.app_name = app_name
         self.twitter_url = twitter_url
         self.mastodon_url = mastodon_url
         self.mastodon_token = mastodon_token
-        self.mastodon_client_id = mastodon_client_id
-        self.mastodon_client_token = mastodon_client_token
         self.twitter_user_id = twitter_user_id
         self.twitter_api_key = twitter_api_key
         self.twitter_api_secret = twitter_api_secret

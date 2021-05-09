@@ -11,5 +11,5 @@
     "TT_APP_SECURE_TOKEN": "XXXXX",
     "TT_STRIP_URLS": "No",
     "TT_INCLUDE_RTS": "No",
-    "TT_MISSKEY": "Yes"
+    "TT_MISSKEY": "No"
 }
