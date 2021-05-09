@@ -2,6 +2,7 @@
 
 import helpers
 import logging
+import os
 import schedule
 import sys
 import time
@@ -40,10 +41,16 @@ def runJob():
         tweet_amount = helpers._config("TT_NUMBER_OF_TWEETS", config)
         strip_urls = False
         include_rts = False
+        misskey = False
+
         if (helpers._config("TT_STRIP_URLS", config).lower() == "yes"):
             strip_urls = True
+
         if (helpers._config("TT_INCLUDE_RTS", config).lower() == "yes"):
             include_rts = True
+
+        if (helpers._config("TT_MISSKEY", config).lower() == "yes"):
+            misskey = True
 
         try:
             job = tweettoot.TweetToot(
@@ -60,7 +67,8 @@ def runJob():
                 twitter_user_secret = twitter_user_secret,
                 strip_urls = strip_urls,
                 include_rts = include_rts,
-                tweet_amount = tweet_amount
+                tweet_amount = tweet_amount,
+                misskey = misskey
             )
             job.relay()
         except Exception as e:
@@ -72,7 +80,7 @@ def runJob():
 if __name__ == "__main__":
     runJob()
     schedule.every(every_x_minutes).minutes.do(runJob)
-    
+
     while 1:
         schedule.run_pending()
         time.sleep(1)    

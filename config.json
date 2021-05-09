@@ -9,8 +9,7 @@
     "TT_NUMBER_OF_TWEETS": 1,
     "TT_HOST_INSTANCE": "https://example.com",
     "TT_APP_SECURE_TOKEN": "XXXXX",
-    "TT_APP_CLIENT_ID": "XXXXX",
-    "TT_APP_CLIENT_TOKEN": "XXXXX",
     "TT_STRIP_URLS": "No",
-    "TT_INCLUDE_RTS": "No"
+    "TT_INCLUDE_RTS": "No",
+    "TT_MISSKEY": "Yes"
 }

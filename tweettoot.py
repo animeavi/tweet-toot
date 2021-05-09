@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from mastodon import Mastodon
+from Misskey import Misskey
 from tweepy import API
 from tweepy import OAuthHandler
 import helpers
@@ -29,6 +30,7 @@ class TweetToot:
     tweet_amount = 1
     strip_urls = False
     include_rts = False
+    misskey = False
     posted_ids = []
     remove_url_re = r'(https|http)?:\/\/(\w|\.|\/|\?|\=|\&|\%)*\b'
     twitter_username_re = re.compile(r'(?<=^|(?<=[^a-zA-Z0-9-\.]))@([A-Za-z0-9_]+)')
@@ -37,7 +39,8 @@ class TweetToot:
     def __init__(self, app_name: str, twitter_url: str, mastodon_url: str, mastodon_token: str,
                 mastodon_client_id: str, mastodon_client_token: str, twitter_user_id: str,
                 twitter_api_key: str, twitter_api_secret: str, twitter_user_key: str,
-                twitter_user_secret: str, strip_urls: bool, include_rts: bool, tweet_amount: int):
+                twitter_user_secret: str, strip_urls: bool, include_rts: bool, tweet_amount: int,
+                misskey: bool):
         self.app_name = app_name
         self.twitter_url = twitter_url
         self.mastodon_url = mastodon_url
@@ -54,6 +57,7 @@ class TweetToot:
         self.posted_ids = self.read_posted_ids()
         self.tweet_amount = tweet_amount
         self.logger_prefix = self.app_name + " - "
+        self.misskey = misskey
 
     def relay(self):
         if not self.app_name:
@@ -102,24 +106,39 @@ class TweetToot:
 
             tweet_media = self.get_tweet_media(tweet, twitter_api, is_rt)
 
-            # Only initialize the Mastodon API if we find something
-            mastodon_api = Mastodon(
-                access_token=self.mastodon_token,
-                api_base_url=self.mastodon_url
-            )
+            if not self.misskey:
+                # Only initialize the Mastodon API if we find something
+                mastodon_api = Mastodon(
+                    access_token=self.mastodon_token,
+                    api_base_url=self.mastodon_url
+                )
 
-            media_ids = []
-            for media in tweet_media:
-                media_id = self.transfer_media(media, mastodon_api)
-                if (media_id != -1):
-                    media_ids.append(media_id);
-            post_id = -1
-            post_id = self.post_tweet(media_ids, tweet_text, tweet_id, mastodon_api)
-            if (post_id != -1):
-                logger.info(self.logger_prefix + "Tweet posted to Mastodon successfully (" + str(tweet_id) + ")!")
-                self.update_posted_ids(str(tweet_id))
+                media_ids = []
+                for media in tweet_media:
+                    media_id = self.transfer_media(media, mastodon_api)
+                    if (media_id != -1):
+                        media_ids.append(media_id);
+                post_id = -1
+                post_id = self.post_tweet(media_ids, tweet_text, tweet_id, mastodon_api)
+                if (post_id != -1):
+                    logger.info(self.logger_prefix + "Tweet posted to Mastodon successfully (" + str(tweet_id) + ")!")
+                    self.update_posted_ids(str(tweet_id))
+                else:
+                    logger.error(self.logger_prefix + "Failed to post Tweet to Mastodon (" + str(tweet_id) + ")!")
             else:
-                logger.error(self.logger_prefix + "Failed to post Tweet to Mastodon (" + str(tweet_id) + ")!")
+                misskey = Misskey(self.mastodon_url, i=self.mastodon_token)
+                media_ids = []
+                for media in tweet_media:
+                    media_id = self.transfer_media_misskey(media, misskey)
+                    if (media_id != -1):
+                        media_ids.append(media_id);
+                post_id = -1
+                post_id = misskey.notes_create(text=tweet_text, fileIds=media_ids)['createdNote']['id']
+                if (post_id != -1):
+                    logger.info(self.logger_prefix + "Tweet posted to Misskey successfully (" + str(tweet_id) + ")!")
+                    self.update_posted_ids(str(tweet_id))
+                else:
+                    logger.error(self.logger_prefix + "Failed to post Tweet to Misskey (" + str(tweet_id) + ")!")
 
     def get_latest_tweets(self, twitter_api, amount):
         # count: maximum allowed tweets count
@@ -239,6 +258,31 @@ class TweetToot:
         logger.info(self.logger_prefix + "Uploading " + media_url + " to Mastodon")
 
         media_id = mastodon_api.media_post(upload_file_name)["id"]
+
+        temp_file_read.close()
+        os.unlink(upload_file_name)
+
+        return media_id
+
+    def transfer_media_misskey(self, media_url, misskey):
+        media_id = -1
+
+        logger.info(self.logger_prefix + "Downloading " + media_url)
+
+        media_file = requests.get(media_url, stream=True)
+        media_file.raw.decode_content = True
+
+        temp_file = tempfile.NamedTemporaryFile(delete=False)
+        temp_file.write(media_file.raw.read())
+        temp_file.close()
+        file_extension = mimetypes.guess_extension(media_file.headers['Content-type'])
+        upload_file_name = temp_file.name + file_extension
+        os.rename(temp_file.name, upload_file_name)
+        temp_file_read = open(upload_file_name, 'rb')
+
+        logger.info(self.logger_prefix + "Uploading " + media_url + " to Misskey")
+
+        media_id = misskey.drive_files_create(upload_file_name)["id"]
 
         temp_file_read.close()
         os.unlink(upload_file_name)

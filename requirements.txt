@@ -5,4 +5,5 @@ requests==2.23.0
 urllib3==1.25.8
 tweepy==3.10.0
 schedule==1.0.0
+Misskey.py==3.0.0
 git+https://github.com/animeavi/Mastodon.py.git@master
