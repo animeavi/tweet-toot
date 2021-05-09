@@ -104,8 +104,6 @@ class TweetToot:
 
             # Only initialize the Mastodon API if we find something
             mastodon_api = Mastodon(
-                client_id=self.mastodon_client_id,
-                client_secret=self.mastodon_client_token,
                 access_token=self.mastodon_token,
                 api_base_url=self.mastodon_url
             )
