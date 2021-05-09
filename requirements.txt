@@ -1,9 +1,9 @@
-certifi==2020.4.5.1
-chardet==3.0.4
-idna==2.9
-requests==2.23.0
-urllib3==1.25.8
+certifi==2020.12.5
+chardet==4.0.0
+idna==2.10
+requests==2.25.1
+urllib3==1.26.4
 tweepy==3.10.0
-schedule==1.0.0
+schedule==1.1.0
 Misskey.py==3.0.0
 git+https://github.com/animeavi/Mastodon.py.git@master
