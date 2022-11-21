@@ -116,10 +116,10 @@ class TweetToot:
                 post_id = -1
                 post_id = self.post_tweet(media_ids, tweet_text, tweet_id, mastodon_api)
                 if (post_id != -1):
-                    logger.info(self.logger_prefix + "Tweet posted to Mastodon successfully (" + str(tweet_id) + ")!")
+                    logger.info(self.logger_prefix + "Tweet posted to " + self.mastodon_url + " successfully (" + str(tweet_id) + ")!")
                     self.update_posted_ids(str(tweet_id))
                 else:
-                    logger.error(self.logger_prefix + "Failed to post Tweet to Mastodon (" + str(tweet_id) + ")!")
+                    logger.error(self.logger_prefix + "Failed to post Tweet to " + self.mastodon_url + " (" + str(tweet_id) + ")!")
             else:
                 misskey = Misskey(self.mastodon_url, i=self.mastodon_token)
                 media_ids = []
@@ -130,10 +130,10 @@ class TweetToot:
                 post_id = -1
                 post_id = misskey.notes_create(text=tweet_text, fileIds=media_ids)['createdNote']['id']
                 if (post_id != -1):
-                    logger.info(self.logger_prefix + "Tweet posted to Misskey successfully (" + str(tweet_id) + ")!")
+                    logger.info(self.logger_prefix + "Tweet posted to " + self.mastodon_url + " successfully (" + str(tweet_id) + ")!")
                     self.update_posted_ids(str(tweet_id))
                 else:
-                    logger.error(self.logger_prefix + "Failed to post Tweet to Misskey (" + str(tweet_id) + ")!")
+                    logger.error(self.logger_prefix + "Failed to post Tweet to " + self.mastodon_url + " (" + str(tweet_id) + ")!")
 
     def get_latest_tweets(self, twitter_api, amount):
         # count: maximum allowed tweets count
@@ -250,7 +250,7 @@ class TweetToot:
         os.rename(temp_file.name, upload_file_name)
         temp_file_read = open(upload_file_name, 'rb')
 
-        logger.info(self.logger_prefix + "Uploading " + media_url + " to Mastodon")
+        logger.info(self.logger_prefix + "Uploading " + media_url + " to " + self.mastodon_url)
 
         media_id = mastodon_api.media_post(upload_file_name)["id"]
 
@@ -275,7 +275,7 @@ class TweetToot:
         os.rename(temp_file.name, upload_file_name)
         temp_file_read = open(upload_file_name, 'rb')
 
-        logger.info(self.logger_prefix + "Uploading " + media_url + " to Misskey")
+        logger.info(self.logger_prefix + "Uploading " + media_url + " to " + self.mastodon_url)
 
         media_id = misskey.drive_files_create(upload_file_name)["id"]
 
